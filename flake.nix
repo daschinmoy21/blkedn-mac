@@ -24,14 +24,9 @@
         modules = [./home.nix];
       };
   in {
-    formatter = nixpkgs.lib.genAttrs ["aarch64-darwin" "x86_64-darwin"] (
-      system: nixpkgs.legacyPackages.${system}.alejandra
-    );
+    formatter.aarch64-darwin = nixpkgs.legacyPackages.aarch64-darwin.alejandra;
 
-    # Apple Silicon (almost certainly your work Mac) and Intel.
-    homeConfigurations = {
-      mac = mkHome "aarch64-darwin";
-      mac-intel = mkHome "x86_64-darwin";
-    };
+    # Apple Silicon only: nixpkgs 26.11 dropped x86_64-darwin (Intel Macs).
+    homeConfigurations.mac = mkHome "aarch64-darwin";
   };
 }

@@ -14,9 +14,10 @@ providers are turned off; nvim uses `pbcopy` on macOS).
 
 ```sh
 git clone https://github.com/daschinmoy21/blkedn-mac ~/blkedn-mac && cd ~/blkedn-mac
-nix run home-manager/master -- switch --flake .#mac --impure -b backup   # .#mac-intel on Intel Macs
+nix run home-manager/master -- switch --flake .#mac --impure -b backup  
 ```
 
+Apple Silicon only (nixpkgs 26.11 dropped Intel Macs).
 `--impure` is only there so the Mac username is read from `$USER`.
 Needs flakes enabled (`experimental-features = nix-command flakes` in `~/.config/nix/nix.conf`).
 
