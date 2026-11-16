@@ -9,13 +9,17 @@ Mirrored today:
 - **Neovim (nvf)**: `rice/nvf.nix`, including the LSPs nvf installs for its enabled languages.
 - **Fish + CLI tools**: `apps/fish.nix` and `apps/tui.nix` (fzf, zoxide, eza, fd, bat, bottom, numbat, lazygit).
 - **claude-code**: from the `llm-agents` flake, pinned to the same version as blkedn.
+- **Window manager**: niri can't run on macOS, so [OmniWM](https://github.com/OmniNull/OmniWM) (niri-style scrolling
+  columns) stands in, with the keybinds from `rice/niri/keybinds.nix` translated in `omniwm.nix`.
+  See [Window manager](#window-manager-omniwm).
 
 Helix and the Linux desktop stuff are left out.
 It also reuses blkedn's pinned nixpkgs, home-manager and nvf, so the Mac gets the same nvim and plugin versions.
 
-The only differences from blkedn live in the "macOS overrides" block of `home.nix`:
+The differences from blkedn live in the "macOS overrides" block of `home.nix`:
 Wayland/X11 clipboard providers are turned off (nvim uses `pbcopy`), `wl-clipboard` is stubbed out,
 and the fish aliases (`build`, `update`, ...) run `home-manager` instead of `nh os switch`.
+`omniwm.nix` is the one module written here instead of imported.
 
 ## First time on the Mac
 
@@ -96,6 +100,78 @@ One-off in the current session: `fish_add_path ~/some/dir`.
 Installing tools: `nix run nixpkgs#<tool>` to try one, `nix shell nixpkgs#<tool>` for a throwaway shell, or add it to
 `home.packages` in `home.nix` to keep it.
 
+## Window manager (OmniWM)
+
+`omniwm.nix` installs OmniWM, starts it at login (launchd) and applies the niri keybinds and layout settings.
+Needs macOS 26+ on Apple Silicon.
+
+niri's `Mod` (Super) is **Option** and niri's `Alt` is **Command**: the same physical keys on a Mac keyboard.
+Both are one-line variables at the top of `omniwm.nix`.
+
+### First run
+
+1. `build` (or the `home-manager switch` above). OmniWM launches.
+2. Grant **Accessibility** and **Input Monitoring** in the window it opens, then click **Start OmniWM**.
+   `Displays have separate Spaces` must be on (System Settings > Desktop & Dock > Mission Control; it is by default).
+3. Run `omniwm-apply` once. OmniWM writes its settings file on first launch, so the first `build` had nothing
+   to patch yet. Every later `build` applies the binds by itself.
+
+If macOS asks about a background item from "org.nix-community.home.omniwm", allow it: that is the login agent.
+
+### Keybinds
+
+| niri | Mac | Action |
+|------|-----|--------|
+| `Mod+1-9` | `Option+1-9` | switch to workspace |
+| `Mod+Ctrl+1-9` | `Ctrl+Option+1-9` | move column to workspace |
+| `Mod+U` / `Mod+I` | `Option+U` / `Option+I` | workspace down / up |
+| `Mod+Ctrl+Alt+Down/Up` | `Ctrl+Option+Cmd+Down/Up` | move column to workspace down / up |
+| `Mod+H/J/K/L` | `Option+H/J/K/L` | focus column left / window down / window up / column right |
+| `Mod+Shift+H/L` | `Option+Shift+H/L` | move column left / right |
+| `Mod+Shift+J/K` | `Option+Shift+J/K` | move window down / up |
+| `Mod+[` / `Mod+]` | `Option+[` / `Option+]` | consume or expel window left / right |
+| `Mod+.` | `Option+.` | expel window from column |
+| `Mod+Home/End` | `Option+Home/End` | focus first / last column |
+| `Mod+Ctrl+Home/End` | `Ctrl+Option+Home/End` | move column to first / last |
+| `Mod+Ctrl+H/L` | `Ctrl+Option+H/L` | focus previous / next monitor |
+| `Mod+Shift+Ctrl+H/J/K/L` | `Ctrl+Option+Shift+H/J/K/L` | move window to monitor |
+| `Mod+Q` | `Option+Q` | close window |
+| `Mod+Alt+F` | `Option+Cmd+F` | maximize column |
+| `Mod+Shift+F` | `Option+Shift+F` | fullscreen |
+| `Mod+Ctrl+F` | `Ctrl+Option+F` | expand column to available width |
+| `Mod+W` | `Option+W` | toggle floating |
+| `Mod+V` | `Option+V` | toggle tabbed column |
+| `Mod+R` / `Mod+Shift+R` | `Option+R` / `Option+Shift+R` | cycle preset column width / window height |
+| `Mod+Ctrl+R` | `Ctrl+Option+R` | reset window height |
+| `Mod+Ctrl+C` | `Ctrl+Option+C` | center column |
+| `Mod+-` / `Mod+=` | `Option+-` / `Option+=` | column width -/+ 10% |
+| `Mod+Shift+-` / `Mod+Shift+=` | `Option+Shift+-` / `Option+Shift+=` | window height -/+ 10% |
+| `Mod+X` | `Option+X` | overview |
+| `Mod+Space` | `Cmd+Space` | launcher (Raycast, set up outside this repo) |
+
+What does not carry over:
+
+- OmniWM allows one chord per action, so the arrow-key and `Mod+O` duplicates are dropped (HJKL and `Mod+X` kept).
+  Overview is `Option+X`, not `Cmd+X`: a global hotkey on `Cmd+X` would take Cut away from every app.
+  That also leaves `Option+Arrow` to macOS for word-by-word cursor movement.
+- No equivalent for reordering workspaces (`Mod+Shift+U/I`) or directional monitor focus (it cycles instead).
+- App launchers (`Mod+T`, `Mod+B`, ...) and screenshots: OmniWM hotkeys can't start apps. Use Raycast,
+  and `Cmd+Shift+4` / `Cmd+Shift+5` for screenshots.
+- `Option+<letter>` no longer types special characters (`Option+U` was the umlaut dead key, and so on).
+- OmniWM's default workspaces 6 and 7 live on the second monitor and have emoji names. Change that in its Settings.
+
+### Changing binds or settings
+
+Edit `omniwm.nix`, then `build`. The action ids are OmniWM's own (Settings > Hotkeys shows every action; the ids are in
+`~/.config/omniwm/settings.toml`). Any other action still holding a chord you assign gets unassigned, and the previous
+file is kept as `settings.toml.bak`.
+
+OmniWM's Settings window still works, since the file stays writable. Values set in `omniwm.nix` win again on the
+next `build`; everything else you change in the GUI is kept.
+
+Troubleshooting: `launchctl list | grep omniwm` shows the agent, logs are in `/tmp/omniwm.err.log`.
+If a chord does nothing, look in Settings > Hotkeys for a registration warning, then for another app holding it.
+
 ## Staying in sync with blkedn
 
 ```sh
@@ -106,6 +182,7 @@ home-manager switch --flake .#mac
 ```
 
 If you change blkedn's nvim config, push blkedn first, then run the above.
+The niri keybinds are the exception: change one in blkedn and mirror it by hand in `omniwm.nix`.
 
 ## Adding more later
 

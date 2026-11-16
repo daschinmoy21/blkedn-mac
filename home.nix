@@ -15,6 +15,9 @@ in {
     "${inputs.blkedn}/rice/nvf.nix"
     "${inputs.blkedn}/apps/fish.nix" # fish (vi keys); aliases overridden below
     "${inputs.blkedn}/apps/tui.nix" # fzf, zoxide, eza, fd, bat, bottom, numbat, lazygit
+
+    # Mac-only: niri can't run here, so its keybinds are translated for OmniWM.
+    ./omniwm.nix
   ];
 
   home.username = user;
