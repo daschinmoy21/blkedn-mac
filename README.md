@@ -40,11 +40,11 @@ echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
 
 ```sh
 git clone https://github.com/daschinmoy21/blkedn-mac ~/blkedn-mac && cd ~/blkedn-mac
-nix run home-manager/master -- switch --flake .#mac --impure -b backup
+nix run home-manager/master -- switch --flake .#mac -b backup
 ```
 
 - `git` comes with the Xcode command line tools; macOS offers to install them on first use.
-- `--impure` is only there so the Mac username is read from `$USER`.
+- The username defaults to `daschinmoy` (see `home.nix`). On another Mac, change it there, or add `--impure` to read `$USER`.
 - `-b backup` renames any existing conflicting dotfile (e.g. `~/.config/nvim`) to `*.backup` instead of failing.
 - The first run downloads and builds a lot; later runs are fast.
 - If it warns about untrusted substituters, add your user to `trusted-users` in `/etc/nix/nix.conf` (or ignore it; it just builds more locally).
@@ -52,7 +52,7 @@ nix run home-manager/master -- switch --flake .#mac --impure -b backup
 **4. Use it.** Open a new terminal and run `nvim`. Run `fish` to try the shell. From now on `home-manager` is on your PATH:
 
 ```sh
-home-manager switch --flake ~/blkedn-mac#mac --impure
+home-manager switch --flake ~/blkedn-mac#mac
 ```
 
 ### Making fish your shell (optional)
@@ -71,8 +71,9 @@ chsh -s ~/.nix-profile/bin/fish
 
 ```sh
 cd ~/blkedn-mac
-nix flake update blkedn          # pulls the latest blkedn commit + its pins
-home-manager switch --flake .#mac --impure
+git pull
+nix flake update blkedn
+home-manager switch --flake .#mac
 ```
 
 If you change blkedn's nvim config, push blkedn first, then run the above.

@@ -4,9 +4,10 @@
   pkgs,
   ...
 }: let
-  # Needs `--impure` (see README) so one flake works for any Mac username.
+  # Defaults to this Mac's user so a plain (pure) switch works. If your username
+  # differs, change it here (or pass `--impure` to read $USER instead).
   user = let u = builtins.getEnv "USER"; in
-    if u == "" then "user" else u;
+    if u == "" then "daschinmoy" else u;
 in {
   imports = [
     # Mirrored verbatim from the main config. Edit nvim in blkedn, not here.
@@ -29,8 +30,8 @@ in {
 
   # blkedn's aliases drive `nh os switch` (NixOS-only). Replace them with Mac equivalents.
   programs.fish.shellAliases = lib.mkForce {
-    build = "home-manager switch --flake ~/blkedn-mac#mac --impure";
-    update = "nix flake update --flake ~/blkedn-mac && home-manager switch --flake ~/blkedn-mac#mac --impure";
+    build = "home-manager switch --flake ~/blkedn-mac#mac";
+    update = "nix flake update --flake ~/blkedn-mac && home-manager switch --flake ~/blkedn-mac#mac";
     scrub = "nix-collect-garbage --delete-older-than 7d";
     sweep = "nix-collect-garbage -v";
     assess = "nix-collect-garbage -v --dry-run";
