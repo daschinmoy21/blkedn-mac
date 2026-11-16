@@ -35,6 +35,12 @@ in {
 
   nixpkgs.config.allowUnfree = true;
 
+  # CLI agents from the same llm-agents flake blkedn uses. Add more here
+  # (codex, pi, omp, ccusage, herdr are in blkedn's home.nix).
+  home.packages = [
+    inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-code
+  ];
+
   # --- macOS overrides: the only place this repo differs from blkedn -----------
   # tui.nix installs wl-clipboard (Wayland, Linux-only). Swap it for an empty
   # package here instead of editing blkedn. macOS has pbcopy/pbpaste built in.

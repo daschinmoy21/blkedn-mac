@@ -9,6 +9,9 @@
     nixpkgs.follows = "blkedn/nixpkgs";
     home-manager.follows = "blkedn/home-manager";
     nvf.follows = "blkedn/nvf";
+
+    # claude-code and friends, same pin as blkedn (numtide/llm-agents.nix).
+    llm-agents.follows = "blkedn/llm-agents";
   };
 
   outputs = {

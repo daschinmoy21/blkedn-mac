@@ -8,6 +8,7 @@ Mirrored today:
 
 - **Neovim (nvf)**: `rice/nvf.nix`, including the LSPs nvf installs for its enabled languages.
 - **Fish + CLI tools**: `apps/fish.nix` and `apps/tui.nix` (fzf, zoxide, eza, fd, bat, bottom, numbat, lazygit).
+- **claude-code**: from the `llm-agents` flake, pinned to the same version as blkedn.
 
 Helix and the Linux desktop stuff are left out.
 It also reuses blkedn's pinned nixpkgs, home-manager and nvf, so the Mac gets the same nvim and plugin versions.
