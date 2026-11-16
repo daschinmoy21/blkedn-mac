@@ -11,6 +11,8 @@ in {
   imports = [
     # Mirrored verbatim from the main config. Edit nvim in blkedn, not here.
     "${inputs.blkedn}/rice/nvf.nix"
+    "${inputs.blkedn}/apps/fish.nix" # fish (vi keys); aliases overridden below
+    "${inputs.blkedn}/apps/tui.nix" # fzf, zoxide, eza, fd, bat, bottom, numbat, lazygit
   ];
 
   home.username = user;
@@ -21,6 +23,19 @@ in {
   nixpkgs.config.allowUnfree = true;
 
   # --- macOS overrides: the only place this repo differs from blkedn -----------
+  # tui.nix installs wl-clipboard (Wayland, Linux-only). Swap it for an empty
+  # package here instead of editing blkedn. macOS has pbcopy/pbpaste built in.
+  nixpkgs.overlays = [(final: prev: {wl-clipboard = final.emptyDirectory;})];
+
+  # blkedn's aliases drive `nh os switch` (NixOS-only). Replace them with Mac equivalents.
+  programs.fish.shellAliases = lib.mkForce {
+    build = "home-manager switch --flake ~/blkedn-mac#mac --impure";
+    update = "nix flake update --flake ~/blkedn-mac && home-manager switch --flake ~/blkedn-mac#mac --impure";
+    scrub = "nix-collect-garbage --delete-older-than 7d";
+    sweep = "nix-collect-garbage -v";
+    assess = "nix-collect-garbage -v --dry-run";
+  };
+
   # blkedn's clipboard providers are Wayland/X11 tools (Linux-only packages).
   # Neovim uses pbcopy/pbpaste on macOS automatically.
   programs.nvf.settings.vim.clipboard.providers = {
