@@ -1,4 +1,5 @@
 {
+  config,
   inputs,
   lib,
   pkgs,
@@ -21,6 +22,13 @@ in {
   home.stateVersion = "25.05";
   programs.home-manager.enable = true;
 
+  # Same as blkedn's home.nix. Put user-installed CLIs (claude, npm -g, pipx, ...) on PATH.
+  # To add a dir, edit this list: ~/.config/fish/config.fish is read-only (managed by Nix).
+  home.sessionPath = [
+    "$HOME/.local/bin"
+    "$HOME/.npm-global/bin"
+  ];
+
   nixpkgs.config.allowUnfree = true;
 
   # --- macOS overrides: the only place this repo differs from blkedn -----------
@@ -37,6 +45,7 @@ in {
       source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish
     end
     fish_add_path --path --move $HOME/.nix-profile/bin $HOME/.local/state/nix/profile/bin /nix/var/nix/profiles/default/bin
+    fish_add_path --path ${lib.concatStringsSep " " config.home.sessionPath}
   '';
 
   # blkedn's aliases drive `nh os switch` (NixOS-only). Replace them with Mac equivalents.

@@ -81,6 +81,13 @@ To get back to zsh meanwhile: `chsh -s /bin/zsh`.
 `eza` is configured with icons, so use a [Nerd Font](https://www.nerdfonts.com/) in your terminal
 (`brew install --cask font-iosevka-nerd-font`, or any Nerd Font).
 
+### Adding something to PATH (or other fish config)
+
+Don't append to `~/.config/fish/config.fish`: Nix owns it (read-only link into the store), so `>>` and even
+`sudo` fail with "permission denied", and fish doesn't understand bash's `export PATH=...` anyway.
+Edit `home.sessionPath` in `home.nix` instead (it already has `~/.local/bin` and `~/.npm-global/bin`, same as blkedn),
+then `home-manager switch --flake .#mac`. For a one-off in the current session: `fish_add_path ~/some/dir`.
+
 ## Staying in sync with blkedn
 
 ```sh
