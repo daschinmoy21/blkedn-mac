@@ -23,10 +23,21 @@ and the fish aliases (`build`, `update`, ...) run `home-manager` instead of `nh 
 
 ## First time on the Mac
 
-Starting from a fresh Nix install? Do these in order. Home-manager needs no separate install:
-step 3 runs it straight from GitHub, and it then manages itself.
+Starting from a new Mac? Do these in order (Apple Silicon, macOS 26 or later for the window manager).
+Home-manager needs no separate install: step 4 runs it straight from GitHub, and it then manages itself.
 
-**1. Check Nix works** (open a new terminal first so it's on your PATH):
+Already set up and just want the latest? Skip to [Staying in sync with blkedn](#staying-in-sync-with-blkedn),
+then do step 6 if OmniWM is new to that Mac.
+
+**1. Install Nix** (skip if `nix --version` already works). The official installer, from <https://nixos.org/download/>:
+
+```sh
+sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install)
+```
+
+It asks for your password (it creates the `/nix` volume) and takes a few minutes.
+
+**2. Check Nix works** (open a new terminal first so it's on your PATH):
 
 ```sh
 nix --version
@@ -34,14 +45,14 @@ nix --version
 
 If `nix` is not found, run `. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh` or restart the terminal.
 
-**2. Enable flakes** (not on by default with the official installer; the Determinate installer already has it):
+**3. Enable flakes** (not on by default with the official installer; the Determinate installer already has it):
 
 ```sh
 mkdir -p ~/.config/nix
 echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
 ```
 
-**3. Clone and apply** (Apple Silicon only; nixpkgs 26.11 dropped Intel Macs):
+**4. Clone and apply** (Apple Silicon only; nixpkgs 26.11 dropped Intel Macs):
 
 ```sh
 git clone https://github.com/daschinmoy21/blkedn-mac ~/blkedn-mac && cd ~/blkedn-mac
@@ -53,12 +64,29 @@ nix run home-manager/master -- switch --flake .#mac -b backup
 - `-b backup` renames any existing conflicting dotfile (e.g. `~/.config/nvim`) to `*.backup` instead of failing.
 - The first run downloads and builds a lot; later runs are fast.
 - If it warns about untrusted substituters, add your user to `trusted-users` in `/etc/nix/nix.conf` (or ignore it; it just builds more locally).
+- OmniWM (the window manager) opens a permissions window at the end of this step. That is step 6; it can wait.
 
-**4. Use it.** Open a new terminal and run `nvim`. Run `fish` to try the shell. From now on `home-manager` is on your PATH:
+**5. Use it.** Open a new terminal and run `nvim`. Run `fish` to try the shell. From now on `home-manager` is on your PATH:
 
 ```sh
 home-manager switch --flake ~/blkedn-mac#mac
 ```
+
+Inside fish that command is just `build` (and `update` also bumps the flake inputs). Those are fish aliases, so they
+don't exist in zsh.
+
+**6. Set up the window manager.** In the window OmniWM opened, grant **Accessibility** and **Input Monitoring**,
+click **Start OmniWM**, then apply the niri keybinds once:
+
+```sh
+omniwm-apply
+```
+
+`Option+1-9` now switches workspaces. Details, the full keybind table and troubleshooting are under
+[Window manager](#window-manager-omniwm).
+
+**7. Launcher (optional).** Raycast on `Cmd+Space` is not installed by this repo. Install it yourself, and free the
+chord first in System Settings > Keyboard > Keyboard Shortcuts > Spotlight.
 
 ### Making fish your shell (optional)
 
@@ -110,7 +138,9 @@ Both are one-line variables at the top of `omniwm.nix`.
 
 ### First run
 
-1. `build` (or the `home-manager switch` above). OmniWM launches.
+1. `home-manager switch --flake ~/blkedn-mac#mac` (`build` in fish). OmniWM launches.
+   If its window doesn't appear, restart the agent with
+   `launchctl kickstart -k gui/$(id -u)/org.nix-community.home.omniwm` and check `/tmp/omniwm.err.log`.
 2. Grant **Accessibility** and **Input Monitoring** in the window it opens, then click **Start OmniWM**.
    `Displays have separate Spaces` must be on (System Settings > Desktop & Dock > Mission Control; it is by default).
 3. Run `omniwm-apply` once. OmniWM writes its settings file on first launch, so the first `build` had nothing
