@@ -64,14 +64,19 @@ echo ~/.nix-profile/bin/fish | sudo tee -a /etc/shells
 chsh -s ~/.nix-profile/bin/fish
 ```
 
-Nix is already on fish's PATH: `home.nix` sources the Nix installer's fish profile
-(`/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish`), because the installer only sets up zsh and bash.
-So `nix` and `home-manager` work after `chsh` with no manual step. Check with `fish -c 'which nix home-manager'`.
-If you switch to fish before the next `home-manager switch`, run this once in fish to fix it by hand:
+Nix is already on fish's PATH: `home.nix` sources the Nix installer's fish profile and adds your Nix profile
+(`~/.nix-profile/bin`) to PATH, because the installer only sets up zsh and bash. Without this, a fish login shell
+shows `fzf was not found in path` and `Unknown command: zoxide`.
+
+If you see those errors, you switched to fish before this config was applied. From fish, one time:
 
 ```fish
-fish_add_path /nix/var/nix/profiles/default/bin ~/.nix-profile/bin
+fish_add_path ~/.nix-profile/bin /nix/var/nix/profiles/default/bin
+cd ~/blkedn-mac; git pull; nix flake update blkedn; home-manager switch --flake .#mac
 ```
+
+Then open a new terminal tab. Check with `fish -c 'which nix home-manager fzf zoxide'`.
+To get back to zsh meanwhile: `chsh -s /bin/zsh`.
 
 `eza` is configured with icons, so use a [Nerd Font](https://www.nerdfonts.com/) in your terminal
 (`brew install --cask font-iosevka-nerd-font`, or any Nerd Font).
