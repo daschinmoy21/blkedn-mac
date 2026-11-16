@@ -28,6 +28,14 @@ in {
   # package here instead of editing blkedn. macOS has pbcopy/pbpaste built in.
   nixpkgs.overlays = [(final: prev: {wl-clipboard = final.emptyDirectory;})];
 
+  # The Nix installer only wires zsh/bash into PATH. Source its fish profile too, so
+  # `nix` and `home-manager` work when fish is the login shell (e.g. after `chsh`).
+  programs.fish.shellInit = ''
+    if test -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish
+      source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish
+    end
+  '';
+
   # blkedn's aliases drive `nh os switch` (NixOS-only). Replace them with Mac equivalents.
   programs.fish.shellAliases = lib.mkForce {
     build = "home-manager switch --flake ~/blkedn-mac#mac";

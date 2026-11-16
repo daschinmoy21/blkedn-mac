@@ -64,6 +64,15 @@ echo ~/.nix-profile/bin/fish | sudo tee -a /etc/shells
 chsh -s ~/.nix-profile/bin/fish
 ```
 
+Nix is already on fish's PATH: `home.nix` sources the Nix installer's fish profile
+(`/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish`), because the installer only sets up zsh and bash.
+So `nix` and `home-manager` work after `chsh` with no manual step. Check with `fish -c 'which nix home-manager'`.
+If you switch to fish before the next `home-manager switch`, run this once in fish to fix it by hand:
+
+```fish
+fish_add_path /nix/var/nix/profiles/default/bin ~/.nix-profile/bin
+```
+
 `eza` is configured with icons, so use a [Nerd Font](https://www.nerdfonts.com/) in your terminal
 (`brew install --cask font-iosevka-nerd-font`, or any Nerd Font).
 
