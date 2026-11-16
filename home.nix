@@ -27,6 +27,10 @@ in {
   home.sessionPath = [
     "$HOME/.local/bin"
     "$HOME/.npm-global/bin"
+    # Mac extras: where common installers drop binaries (cargo install, bun, go install).
+    "$HOME/.cargo/bin"
+    "$HOME/.bun/bin"
+    "$HOME/go/bin"
   ];
 
   nixpkgs.config.allowUnfree = true;
@@ -46,6 +50,8 @@ in {
     end
     fish_add_path --path --move $HOME/.nix-profile/bin $HOME/.local/state/nix/profile/bin /nix/var/nix/profiles/default/bin
     fish_add_path --path ${lib.concatStringsSep " " config.home.sessionPath}
+    # Writable escape hatch for machine-local fish config (not managed by Nix).
+    test -f ~/.config/fish/local.fish; and source ~/.config/fish/local.fish
   '';
 
   # blkedn's aliases drive `nh os switch` (NixOS-only). Replace them with Mac equivalents.

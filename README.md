@@ -86,7 +86,14 @@ To get back to zsh meanwhile: `chsh -s /bin/zsh`.
 Don't append to `~/.config/fish/config.fish`: Nix owns it (read-only link into the store), so `>>` and even
 `sudo` fail with "permission denied", and fish doesn't understand bash's `export PATH=...` anyway.
 Edit `home.sessionPath` in `home.nix` instead (it already has `~/.local/bin` and `~/.npm-global/bin`, same as blkedn),
-then `home-manager switch --flake .#mac`. For a one-off in the current session: `fish_add_path ~/some/dir`.
+then `home-manager switch --flake .#mac`. It also covers `~/.cargo/bin`, `~/.bun/bin` and `~/go/bin`, so installers
+that drop binaries there just work (their attempt to edit `config.fish` fails harmlessly).
+
+Anything machine-local: put it in `~/.config/fish/local.fish`. It's loaded if present, and it's a normal writable file.
+One-off in the current session: `fish_add_path ~/some/dir`.
+
+Installing tools: `nix run nixpkgs#<tool>` to try one, `nix shell nixpkgs#<tool>` for a throwaway shell, or add it to
+`home.packages` in `home.nix` to keep it.
 
 ## Staying in sync with blkedn
 
