@@ -9,6 +9,7 @@
     nixpkgs.follows = "blkedn/nixpkgs";
     home-manager.follows = "blkedn/home-manager";
     nvf.follows = "blkedn/nvf";
+    differ.follows = "blkedn/differ"; # Neovim git review plugin used by blkedn's nvf config
 
     # claude-code and friends, same pin as blkedn (numtide/llm-agents.nix).
     llm-agents.follows = "blkedn/llm-agents";

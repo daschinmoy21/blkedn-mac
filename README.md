@@ -6,7 +6,10 @@ blkedn is the source of truth. This repo copies nothing from it: `flake.nix` tak
 
 Mirrored today:
 
-- **Neovim (nvf)**: `rice/nvf.nix`, including the LSPs nvf installs for its enabled languages.
+- **Neovim (nvf)**: `rice/nvf.nix`, including the LSPs nvf installs for its enabled languages, plus
+  **Differ** (git review: `<leader>gd` changes, `<leader>gh` file history) and **Avante** (AI chat/edit, maps under `<leader>a`).
+  Avante's Claude provider reads `ANTHROPIC_API_KEY` from your environment. Put it in `~/.config/fish/local.fish`
+  (`set -gx ANTHROPIC_API_KEY ...`), never in the repo.
 - **Fish + CLI tools**: `apps/fish.nix` and `apps/tui.nix` (fzf, zoxide, eza, fd, bat, bottom, numbat, lazygit).
 - **claude-code**: from the `llm-agents` flake, pinned to the same version as blkedn.
 - **Window manager**: niri can't run on macOS, so [OmniWM](https://github.com/OmniNull/OmniWM) (niri-style scrolling
